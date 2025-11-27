@@ -1290,7 +1290,7 @@ function loadContent(mode, chapterSelection = null) {
             title = 'コード入力・実行モード';
             contentHTML = `
                 <h2>${title}</h2>
-                <p>ここにJavaのコードを入力し、「RUN CODE」を押して実行結果（シミュレーション）を確認してください。</p>
+                <p>ここにJavaのコードを入力し、「RUN CODE」を押して実行結果を確認してください。</p>
                 <div class="code-area">
                     <textarea id="java-code" placeholder="public class Main { ... }" rows="10"></textarea>
                     <button id="run-button">RUN CODE</button>
@@ -1473,40 +1473,76 @@ function loadContent(mode, chapterSelection = null) {
 
 
 // ===================================
-// 6. コード実行ロジック (シミュレーション)
+// 6. コード実行ロジック (Piston API利用版・安定版)
 // ===================================
 function setupPracticeModeListeners() {
     const runButton = document.getElementById('run-button');
     const javaCodeArea = document.getElementById('java-code');
     const outputArea = document.getElementById('output-area');
-
+    
+    const API_ENDPOINT = "https://emkc.org/api/v2/piston/execute"; 
+    
     if (runButton) {
         runButton.addEventListener('click', () => {
             const code = javaCodeArea.value;
-            
-            outputArea.textContent = "RUNNING...";
+            outputArea.textContent = "RUNNING... (Executing code via external API)";
+            runButton.disabled = true; 
 
-            setTimeout(() => {
-                if (code.includes("System.out.println") || code.includes("System.out.print")) {
-                    outputArea.textContent = 
-                        "コードは正常にコンパイルされました。\n" + 
-                        "--- 出力結果 ---\n" +
-                        "CLAの世界へようこそ！ (シミュレーション結果)";
-                } else if (code.trim() === "") {
-                    outputArea.textContent = "エラー: 入力コードが空です。";
+            const requestBody = {
+                language: "java",
+                version: "15.0.2",
+                files: [
+                    {
+                        name: "Main.java",
+                        content: code
+                    }
+                ]
+            };
+
+            fetch(API_ENDPOINT, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(requestBody)
+            })
+            .then(response => response.json())
+            .then(data => {
+                let output = "";
+                
+                if (data.run && data.run.output) {
+                    output = data.run.output;
+                } else if (data.compile && data.compile.output) {
+                    output = `--- COMPILE ERROR ---\n${data.compile.output}`;
+                } else if (data.message) {
+                    output = `API Error: ${data.message}`;
                 } else {
-                    outputArea.textContent = 
-                        "エラー: mainメソッドまたは出力文が見つかりません。\n" + 
-                        "public static void main(String[] args) と System.out.print を確認してください。";
+                    output = `Unknown Error.\n${JSON.stringify(data, null, 2)}`;
                 }
-            }, 1000); 
+
+                outputArea.textContent = `--- Output ---\n${output}`;
+            })
+            .catch(error => {
+                outputArea.textContent = `Error occurred: Check network connection.\n${error.message}`;
+                console.error("API Error:", error);
+            })
+            .finally(() => {
+                runButton.disabled = false;
+            });
         });
         
+        // 初期のコードのテンプレート
+        // 【修正】エンコーディングの問題を回避するため、日本語出力処理を削除
         javaCodeArea.value = 
 `public class Main {
     public static void main(String[] args) {
-        // あなたのコードをここに書きましょう
-        System.out.println("Hello, CLA!");
+        
+        // Your code starts here
+        int x = 5;
+        int y = 10;
+        
+        // Use English/ASCII characters for output to ensure stability
+        System.out.println("Result: " + (x + y)); 
     }
 }`;
     }
