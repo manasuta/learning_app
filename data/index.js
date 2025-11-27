@@ -1,8 +1,6 @@
-// ===================================
-// 0. 課題・問題データの定義 (日本語)
-// ===================================
+// --- data/index.js ---
 
-const CHALLENGE_DATA = [
+export const CHALLENGE_DATA = [
     // --- 【第2回課題】配列とメソッド ---
     {
         id: 1,
@@ -25,7 +23,14 @@ public void showAll(){
         System.out.print("    " + even[i]);
     }
 }
-`
+`,
+        challenge_code: `public FiveEvenNumbers() {
+    even = new int[5];
+    for (int i=0; i < 5; i++) {
+        even[i] = [SNIPPET_HERE]; // 課題: 偶数を格納
+    }
+}`,
+        correct_snippet: "i * 2" 
     },
     {
         id: 2,
@@ -48,7 +53,14 @@ public void showAll(){
         System.out.printf("    %4d", even[i]);
     }
 }
-`
+`,
+        challenge_code: `public EvenNumbers(int size) {
+    even = new int[size];
+    for (int i=0; i < size; i++) {
+        even[i] = [SNIPPET_HERE]; // 課題: 偶数を格納
+    }
+}`,
+        correct_snippet: "i * 2" 
     },
     {
         id: 3,
@@ -57,23 +69,25 @@ public void showAll(){
         description: "長さ4の `String` 配列を操作する `getName()` と `setName()` を実装し、添字が範囲外の場合のエラー処理も行います。",
         keywords: ["文字列配列", "ゲッター/セッター", "添字チェック", "nullを返す"],
         hints: "添字 `idx` が `0` 以上かつ `names.length` 未満であることを確認します。",
-        solution_code: `// FourNames.java (主要メソッドの解答)
+        solution_code: `// FourNames.java (getNameメソッドの解答)
 public String getName(int idx){
-    if(idx >= 0 && idx < this.names.length){
+    if (idx >= 0 && idx < this.names.length) {
         return this.names[idx];
-    }else{
+    } else {
         return null;
     }
 }
-
-public void setName(int idx, String newName){
-    if(idx >= 0 && idx < this.names.length){
-        this.names[idx] = newName;
-    }else{
-        System.out.println("範囲外の添字を指定しています");
-    }
-}
-`
+// ...
+`,
+        challenge_code: `public String getName(int idx) {
+    String ret;
+    if (idx >= 0 && idx < names.length)
+        ret = names[idx];
+    else
+        ret = [SNIPPET_HERE]; // 課題: 範囲外の時の戻り値
+    return ret;
+}`,
+        correct_snippet: "null"
     },
     {
         id: 4,
@@ -82,38 +96,7 @@ public void setName(int idx, String newName){
         description: "`max()`, `min()`, `sum()` などの統計メソッドと、要素を操作するメソッド（`incrementElement`, `copyElement` など）を実装します。",
         keywords: ["最大値/最小値", "総和計算", "配列操作", "配列長チェック"],
         hints: "配列が空の場合の `max()` や `min()` は、それぞれ `Integer.MIN_VALUE`、`Integer.MAX_VALUE` を返すのが定石です。`sum()` は拡張for文が便利です。",
-        solution_code: `// MaxMinAndSumOfNumbers.java (主要メソッドの解答)
-public int max() { 
-    if (this.numbers.length == 0) return Integer.MIN_VALUE;
-    int currentMax = this.numbers[0];
-
-    for (int i = 1; i < this.numbers.length; i++) {
-        if (this.numbers[i] > currentMax) {
-            currentMax = this.numbers[i];
-        }
-    }
-    return currentMax;
-}
-
-public int min() { 
-    if (this.numbers.length == 0) return Integer.MAX_VALUE; 
-    int currentMin = this.numbers[0];
-    for (int i = 1; i < this.numbers.length; i++) {
-        if (this.numbers[i] < currentMin) {
-            currentMin = this.numbers[i];
-        }
-    }
-    return currentMin;
-}
-
-public int sum() { 
-    int currentSum = 0;
-    for (int element : this.numbers) {
-        currentSum += element;
-    }
-    return currentSum;
-}
-
+        solution_code: `// MaxMinAndSumOfNumbers.java (copyElementメソッドの解答)
 public void copyElement(int dest, int src) { 
     if (dest >= 0 && dest < this.numbers.length && src >= 0 && src < this.numbers.length) {
         this.numbers[dest] = this.numbers[src];
@@ -121,7 +104,19 @@ public void copyElement(int dest, int src) {
         System.out.println("範囲外の添字を指定しています.");
     }
 }
-`
+// ...
+`,
+        challenge_code: `public int max() {
+    if (this.numbers.length == 0) return Integer.MIN_VALUE;
+    int currentMax = this.numbers[0];
+    for (int i = 1; i < this.numbers.length; i++) {
+        if ([SNIPPET_HERE]) { // 課題: 最大値の条件
+            currentMax = this.numbers[i];
+        }
+    }
+    return currentMax;
+}`,
+        correct_snippet: "this.numbers[i] > currentMax" 
     },
 
     // --- 【第5回課題】HashMap/ArrayListによる時間割管理 ---
@@ -160,7 +155,11 @@ public void copyElement(int dest, int src) {
     public String getDay() { return this.day; }
     public int getTimeSlot() { return this.timeSlot; }
     public String getTeacher() { return this.teacher; }
-`
+`,
+        challenge_code: `public boolean isValidDay() {
+    return [SNIPPET_HERE]; // 課題: dayがnullでないかチェック
+}`,
+        correct_snippet: "this.day != null"
     },
     {
         id: 6,
@@ -211,7 +210,13 @@ public void copyElement(int dest, int src) {
              showLecturesOfDay(day);
          }
     }
-`
+`,
+        challenge_code: `public boolean isDayRegistered (String day) {
+    boolean retv = false;
+    retv = [SNIPPET_HERE]; // 課題: timetableにdayが含まれているか
+    return retv;
+}`,
+        correct_snippet: "timetable.containsKey(day)"
     },
     {
         id: 7,
@@ -234,11 +239,25 @@ public void copyElement(int dest, int src) {
         }
         return found;
     }
-`
+`,
+        challenge_code: `public boolean showLecturesOfRoom(String room) {
+    boolean retv = false;
+    for (String day : timetable.keySet()) {
+        ArrayList<Lecture> lectures = timetable.get(day);
+        for (Lecture lec : lectures) {
+            if ([SNIPPET_HERE]) { // 課題: 教室名がroomと一致するか
+                System.out.println(lec);
+                retv = true;
+            }
+        }
+    }
+    return retv;
+}`,
+        correct_snippet: "lec.getRoom().equals(room)"
     },
     {
         id: 8,
-        title: "課題5-4: showLecturesByNameRoomTeacher（多条件検索）の実装",
+        title: "課題5-4: showLecturesByNameRoomTeacher（多条件検索）のロジック",
         file: "TimeTable.java",
         description: "授業名、教室、教員名で検索し、一致する授業を表示する showLecturesByNameRoomTeacher を実装します。引数が空白（\"\"）の場合は、その条件を無視して検索してください。",
         keywords: ["複合条件", "ブールフラグ", "equals(\"\")"],
@@ -261,7 +280,22 @@ public void copyElement(int dest, int src) {
         }
         return count > 0;
     }
-`
+`,
+        challenge_code: `public boolean showLecturesByNameRoomTeacher(String name, String room, String teacher) {
+    boolean retv = false;
+    for (String day : timetable.keySet()) {
+        ArrayList<Lecture> lectures = timetable.get(day);
+        for (Lecture lec : lectures) {
+            if (([SNIPPET_HERE]) && (room.equals("") || lec.getRoom().equals(room))
+                && (teacher.equals("") || lec.getTeacher().equals(teacher))) {
+                System.out.println(lec);
+                retv = true;
+            }
+        }
+    }
+    return retv;
+}`,
+        correct_snippet: "name.equals(\"\") || lec.getName().equals(name)"
     },
     {
         id: 9,
@@ -288,7 +322,24 @@ public void copyElement(int dest, int src) {
          }
         return false;
     }
-`
+`,
+        challenge_code: `public boolean removeLecture(Lecture lec) {
+    String day = lec.getDay();
+    ArrayList<Lecture> lectures = timetable.get(day);
+    if (lectures != null) {
+        int idx = lectures.indexOf(lec);
+        if (idx >= 0) {
+            lectures.remove(idx);
+            // 課題6用: removeFromInvertedIndexes(lec);
+            if ([SNIPPET_HERE]) { // 課題: ArrayListが空になったら
+                timetable.remove(day);
+            }
+            return true;
+        }
+    }
+    return false;
+}`,
+        correct_snippet: "lectures.size() == 0"
     },
     {
         id: 10,
@@ -297,45 +348,32 @@ public void copyElement(int dest, int src) {
         description: "教室名からの高速検索を可能にする逆引きインデックス（indexByRoom）を完成させます。addLecture/removeLecture の中でインデックスを更新するメソッドを呼び出し、showLecturesOfRoomIndexed を実装してください。",
         keywords: ["逆引きインデックス", "インデックスの同期", "addToInvertedIndexes", "removeFromInvertedIndexes"],
         hints: "課題6のテストをパスするためには、addLecture と removeLecture の適切な位置で、それぞれ addToInvertedIndexes と removeFromInvertedIndexes を呼び出す必要があります。",
-        solution_code: `// TimeTable.java (課題5-6の解答: 呼び出しと実装)
-
-    // 呼び出し例: addLecture/removeLecture内で呼び出す
-    // if(lectures.indexOf(lec) == -1){ ... lectures.add(lec); addToInvertedIndexes(lec); ... }
-    // if(lectures.remove(lec)){ removeFromInvertedIndexes(lec); ... }
+        solution_code: `// TimeTable.java (課題5-6の解答: showLecturesOfRoomIndexed)
 
     public boolean showLecturesOfRoomIndexed(String room) {
-        if (indexByRoom.containsKey(room)) {
-            ArrayList<Lecture> lectures = indexByRoom.get(room);
-            for (Lecture lec : lectures) {
+        boolean retv = false;
+        ArrayList<Lecture> list = indexByRoom.get(room);
+        if (list != null && list.size() > 0) {
+            for (Lecture lec : list) {
                 System.out.println(lec);
             }
-            return true;
+            retv = true;
         }
-        return false;
+        return retv;
     }
-
-    private void addToInvertedIndexes(Lecture lec) {
-        String room = lec.getRoom();
-        if (indexByRoom.containsKey(room)) {
-            indexByRoom.get(room).add(lec);
-        } else {
-            ArrayList<Lecture> lectures = new ArrayList<Lecture>();
-            lectures.add(lec);
-            indexByRoom.put(room, lectures);
+`,
+        challenge_code: `public boolean showLecturesOfRoomIndexed (String room) {
+    boolean retv = false;
+    ArrayList<Lecture> list = indexByRoom.get(room);
+    if (list != null && list.size() > 0) {
+        for (Lecture lec : [SNIPPET_HERE]) { // 課題: listの要素をループ
+            System.out.println(lec);
         }
+        retv = true;
     }
-
-    private void removeFromInvertedIndexes(Lecture lec) {
-        String room = lec.getRoom();
-        if (indexByRoom.containsKey(room)) {
-            ArrayList<Lecture> lectures = indexByRoom.get(room);
-            lectures.remove(lec);
-            if (lectures.isEmpty()) {
-                indexByRoom.remove(room);
-            }
-        }
-    }
-`
+    return retv;
+}`,
+        correct_snippet: "list"
     },
 
     // --- 【第6回課題】スタックと探索 ---
@@ -378,7 +416,14 @@ public void copyElement(int dest, int src) {
         }
         stack.add(product);
     }
-`
+`,
+        challenge_code: `public int pop() {
+    if (stack.isEmpty()) { System.out.println("スタックは空です"); System.exit(1); }
+    int index = stack.size() - 1;
+    int value = stack.[SNIPPET_HERE]; // 課題: 末尾の要素を取り出して削除
+    return value;
+}`,
+        correct_snippet: "remove(index)"
     },
     {
         id: 12, 
@@ -420,7 +465,14 @@ public int cal() {
     }
     return stack.pop();
 }
-`
+`,
+        challenge_code: `// RPNCalc.java (cal() メソッド内)
+// トークンが数値の場合の処理
+default:
+    stack.push(Integer.parseInt([SNIPPET_HERE])); // 課題: トークンを整数に変換
+    break;
+`,
+        correct_snippet: "word" 
     },
     {
         id: 13, 
@@ -453,9 +505,27 @@ public int findNext(int pos) {
         }
     }
     return retv;
-}
-// solve() メソッドは長大なため、上記 findNext() の実装がコアです。
-`
+}`,
+        challenge_code: `public int findNext(int pos) {
+    // ... (前略) ...
+    for (int i = 0; i < 4; i++) {
+        int next = nextPos[i];
+        
+        // 1. 迷路の範囲内にあるかチェック
+        if (next >= 0 && next < this.maze.length) {
+            // 2. 左右の境界を跨いでいないかチェック
+            if (i == 0 || i == 2) { 
+                int nextRow = next / this.width;
+                if ([SNIPPET_HERE]) { // 課題: 行が変わったかチェック
+                    continue;
+                }
+            }
+            // ... (後略) ...
+        }
+    }
+    return -1;
+}`,
+        correct_snippet: "nextRow != currentRow"
     },
 
     // --- 【第7回課題】オブジェクト連携とコレクション ---
@@ -488,7 +558,12 @@ public int findNext(int pos) {
         makeAnswers(nquestions);
         teacher.markScore(this);
     }
-`
+`,
+        challenge_code: `public void setStudentID(int studentID) {
+    this.studentID = studentID;
+    randBrain = new Random([SNIPPET_HERE]); // 課題: studentIDで乱数を初期化
+}`,
+        correct_snippet: "studentID"
     },
     {
         id: 15, 
@@ -511,10 +586,6 @@ public int findNext(int pos) {
         student.setStudentID(id);
         return true;
     }
-    public void registerSubject(String subjectName, Teacher teacher) {
-        Subject subject = new Subject(subjectName);
-        subjectByTeacher.put(teacher, subject);
-    }
     public int retrieveScore(Teacher teacher, Student student) {
         Subject subject = subjectByTeacher.get(teacher);
         return (subject == null) ? -1 : subject.getScore(student);
@@ -523,8 +594,12 @@ public int findNext(int pos) {
         Subject subject = subjectByTeacher.get(teacher);
         if (subject != null) { subject.setScore(student, score); }
     }
-    // ... 他のメソッドも同様に委譲/実装
-`
+`,
+        challenge_code: `public int retrieveScore(Teacher teacher, Student student) {
+    Subject subject = subjectByTeacher.get(teacher);
+    return (subject == null) ? -1 : subject.[SNIPPET_HERE]; // 課題: Subjectから点数を取得
+}`,
+        correct_snippet: "getScore(student)"
     },
     {
         id: 16, 
@@ -534,14 +609,6 @@ public int findNext(int pos) {
         keywords: ["正答率計算", "kindness下駄", "office.retrieveScore", "HashMapソート", "ゼロ埋め(%04d)"],
         hints: "点数計算は、優しさ(kindness)を引いた残りの(100-kindness)を正答率で配分します。トップ3の表示では、最大点を探した後、そのエントリをリストから削除する必要があります。",
         solution_code: `// Teacher.java (主要メソッドの解答)
-    public void setRightAnswers (String rightAnswerString) {
-        rightAnswerList = new ArrayList<>();
-        for (int i = 0; i < rightAnswerString.length(); i++) {
-            char c = rightAnswerString.charAt(i);
-            if (c == '1') rightAnswerList.add(Boolean.TRUE);
-            else if (c == '0') rightAnswerList.add(Boolean.FALSE);
-        }
-    }
     public int markScore (Student student) {
         // ... (正答数 correct の計算) ...
         int correct = 0; // 実際の実装では計算が必要
@@ -561,11 +628,12 @@ public int findNext(int pos) {
         }
         System.out.println("");
     }
-    public void showTop() {
-        // ... (点数 map を作成し、トップ3をループで探し、idList.remove(Integer) で削除) ...
-        // ... (詳細は長大なため、ここでは省略) ...
-    }
-`
+`,
+        challenge_code: `// Teacher.java (showDisqualifiedメソッド内)
+if (sc >= 0 && sc < [SNIPPET_HERE]) { // 課題: 落単の判定点
+    System.out.printf("[%04d:%s]", s.getStudentID(), s.getName());
+}`,
+        correct_snippet: "60"
     },
     
     // --- 【第8回課題】状態遷移（タイマー） ---
@@ -620,11 +688,21 @@ public int findNext(int pos) {
         stateTransition.put(Button.START, State.READY);
         stateTransition.put(Button.IDOL, State.BEEP);
     }
-`
+`,
+        challenge_code: `void updateState(Button pushedButton) {
+    // ...
+    // 問１：nextStateに次状態を代入する処理
+    nextState = [SNIPPET_HERE];
+    // ...
+    // 問８：時間が0になったら次状態をBEEPにする処理
+    if (remainTime == 0) nextState = State.BEEP;
+    // ...
+}`,
+        correct_snippet: "stateMachine.get(currentState).get(pushedButton)"
     }
 ];
 
-const QUIZ_DATA = [
+export const QUIZ_DATA = [
     // --- Chapter 1: オブジェクト生成とメソッド呼び出し ---
     {
         id: 1,
@@ -1132,7 +1210,7 @@ const QUIZ_DATA = [
     }
 ];
 
-const REVIEW_DATA = [
+export const REVIEW_DATA = [
     {
         id: 1,
         topic: "基本出力",
@@ -1179,572 +1257,3 @@ const REVIEW_DATA = [
         explanation: "**if-else if-else** 構造は、複数の条件を順番にチェックするために使われます。"
     }
 ];
-
-// ===================================
-// 1. 進捗状況の保存と読み込み (LocalStorage)
-// ===================================
-
-/**
- * 現在のインデックスの状態をブラウザに保存する
- */
-function saveProgress() {
-    const progress = {
-        quiz: currentQuizIndex,
-        review: currentReviewIndex,
-        challenge: currentChallengeIndex
-    };
-    localStorage.setItem('claAppProgress', JSON.stringify(progress));
-}
-
-/**
- * ブラウザに保存されているインデックスの状態を読み込む
- */
-function loadProgress() {
-    const saved = localStorage.getItem('claAppProgress');
-    
-    if (saved) {
-        const progress = JSON.parse(saved);
-        
-        currentQuizIndex = progress.quiz || 0;
-        currentReviewIndex = progress.review || 0;
-        currentChallengeIndex = progress.challenge || 0;
-    }
-}
-
-
-// ===================================
-// 2. 問題データの追跡変数
-// ===================================
-let currentQuizIndex = 0; 
-let currentReviewIndex = 0; 
-let currentChallengeIndex = 0; 
-
-let currentChapterId = null; 
-
-loadProgress(); 
-
-// ===================================
-// 3. 初期要素の取得とイベントリスナーの設定
-// ===================================
-const appContainer = document.getElementById('app-container');
-
-const practiceButton = document.getElementById('mode-practice');
-const quizButton = document.getElementById('mode-quiz');
-const reviewButton = document.getElementById('mode-review');
-const challengeButton = document.getElementById('mode-challenge'); 
-
-practiceButton.addEventListener('click', () => {
-    loadContent('practice');
-});
-
-quizButton.addEventListener('click', () => {
-    loadContent('quiz', null);
-});
-
-reviewButton.addEventListener('click', () => {
-    loadContent('review');
-});
-
-challengeButton.addEventListener('click', () => { 
-    loadContent('challenge');
-});
-
-const CHAPTER_TITLES = [
-    "1. オブジェクト生成とメソッド呼び出し",
-    "2. クラスの定義",
-    "3. 基本的な処理の記述",
-    "4. 様々なデータ構造",
-    "5. メッセージパッシング・委譲",
-    "6. 継承・抽象クラス",
-    "7. インタフェース",
-    "8. クラス定義に関する諸技術",
-    "9. ファイル操作",
-    "10. ラムダ式とストリーム"
-];
-
-// ===================================
-// 4. モード選択画面に戻る処理
-// ===================================
-function showModeSelection() {
-    saveProgress();
-    window.location.reload(); 
-}
-
-// ===================================
-// 5. メインコンテンツの読み込みと切り替え
-// ===================================
-/**
- * @param {string} mode - 選択されたモード 
- * @param {number|null} chapterSelection - クイズモードの場合、選択された章のID (0-indexed)
- */
-function loadContent(mode, chapterSelection = null) {
-    let contentHTML = '';
-    let title = '';
-
-    if (mode === 'quiz' && chapterSelection !== null) {
-        currentChapterId = chapterSelection;
-    }
-
-    switch (mode) {
-        case 'practice':
-            title = 'コード入力・実行モード';
-            contentHTML = `
-                <h2>${title}</h2>
-                <p>ここにJavaのコードを入力し、「RUN CODE」を押して実行結果を確認してください。</p>
-                <div class="code-area">
-                    <textarea id="java-code" placeholder="public class Main { ... }" rows="10"></textarea>
-                    <button id="run-button">RUN CODE</button>
-                    <pre id="output-area">実行結果がここに表示されます...</pre>
-                </div>
-                <button class="back-button">← モード選択に戻る</button>
-            `;
-            break;
-
-        case 'quiz':
-            if (chapterSelection === null) {
-                // --- 章選択画面を表示 ---
-                title = 'クイズ・章選択';
-                const chapterListHTML = CHAPTER_TITLES.map((title, index) => `
-                    <button class="chapter-button mode-button" data-chapter-id="${index}" style="background-color: #34495e;">
-                        ${title}
-                    </button>
-                `).join('');
-
-                contentHTML = `
-                    <h2>${title}</h2>
-                    <p>解きたい問題の章を選択してください。</p>
-                    <div class="mode-selection" style="gap: 15px; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
-                        ${chapterListHTML}
-                    </div>
-                    <button class="back-button" style="margin-top: 20px;">← モード選択に戻る</button>
-                `;
-
-            } else {
-                // --- 選択された章の問題を表示 ---
-                
-                const targetChapterTitle = CHAPTER_TITLES[currentChapterId];
-                const chapterPrefix = targetChapterTitle.split('.')[0];
-
-                // 選択された章の問題だけをフィルタリング
-                const chapterQuizzes = QUIZ_DATA.filter(q => q.topic.startsWith(chapterPrefix));
-                
-                // 現在の章内でのインデックスとグローバルインデックスの調整
-                let startIndex = QUIZ_DATA.findIndex(q => q.topic.startsWith(chapterPrefix));
-                if (startIndex === -1) startIndex = 0;
-
-                if (currentQuizIndex < startIndex || !QUIZ_DATA[currentQuizIndex] || !QUIZ_DATA[currentQuizIndex].topic.startsWith(chapterPrefix)) {
-                     currentQuizIndex = startIndex;
-                }
-                
-                const currentQuiz = QUIZ_DATA[currentQuizIndex]; 
-                const currentQuizInChapterIndex = chapterQuizzes.findIndex(q => q.id === currentQuiz.id);
-                
-                const isFirstInChapter = currentQuizInChapterIndex === 0;
-                const isLastInChapter = currentQuizInChapterIndex === chapterQuizzes.length - 1;
-
-                // ナビゲーションボタンの制御
-                const prevQuizButton = (!isFirstInChapter) ? 
-                    `<button id="prev-quiz-button" style="background-color: #6c757d; color: white; padding: 10px 20px; border: none; border-radius: 4px; margin: 10px 10px;">← 前の問題へ</button>` : '';
-
-                const nextQuizButton = (!isLastInChapter) ? 
-                    `<button id="next-quiz-button" style="background-color: #00bcd4; color: white; padding: 10px 20px; border: none; border-radius: 4px; margin: 10px 10px;">次の問題へ →</button>` : '';
-
-                // HTML生成
-                const optionButtons = currentQuiz.options.map(opt => `<button class="option-button">${opt}</button>`).join('');
-
-                title = 'クイズ・選択式モード';
-                contentHTML = `
-                    <h2>${title}</h2>
-                    <p>${currentQuiz.topic} - 問題 #${currentQuiz.id} (${currentQuizInChapterIndex + 1}/${chapterQuizzes.length})</p>
-                    <div class="quiz-area">
-                        <p class="question">${currentQuiz.question}</p>
-                        <pre class="code-example">${currentQuiz.code_example}</pre>
-                        <div class="options">
-                            ${optionButtons}
-                        </div>
-                        <div id="quiz-feedback" style="margin-top: 15px; font-weight: bold; color: #00bcd4;"></div>
-                    </div>
-                    <button id="check-quiz-button" style="background-color: #f39c12; color: white; padding: 10px 20px; border: none; border-radius: 4px; margin: 10px 0;">答えをチェック</button>
-                    <div style="margin-top: 10px;">
-                        ${prevQuizButton}
-                        ${nextQuizButton}
-                    </div>
-                    <button id="back-to-chapter-button" class="back-button">← 章選択に戻る</button>
-                `;
-            }
-            break;
-
-        case 'review':
-            title = '復習・解説表示モード';
-            const currentReview = REVIEW_DATA[currentReviewIndex]; 
-
-            const prevReviewButton = (currentReviewIndex > 0) ? 
-                `<button id="prev-review-button" style="background-color: #6c757d; color: white; padding: 10px 20px; border: none; border-radius: 4px; margin: 10px 10px;">← 前の例題へ</button>` : '';
-
-            const nextReviewButton = (currentReviewIndex < REVIEW_DATA.length - 1) ? 
-                `<button id="next-review-button" style="background-color: #00bcd4; color: white; padding: 10px 20px; border: none; border-radius: 4px; margin: 10px 10px;">次の例題へ →</button>` : '';
-
-            contentHTML = `
-                <h2>${title}</h2>
-                <p>トピック: ${currentReview.topic} (${currentReviewIndex + 1}/${REVIEW_DATA.length})</p>
-                <div class="review-area">
-                    <h3>${currentReview.title}</h3>
-                    <pre class="code-example">${currentReview.code_example}</pre>
-                    <p><strong>解説:</strong> ${currentReview.explanation}</p>
-                </div>
-                <div style="margin-top: 10px;">
-                    ${prevReviewButton}
-                    ${nextReviewButton}
-                </div>
-                <button class="back-button">← モード選択に戻る</button>
-            `;
-            break;
-            
-        case 'challenge':
-            title = '課題ステップバイステップ学習';
-            const currentChallenge = CHALLENGE_DATA[currentChallengeIndex]; 
-
-            const prevChButton = (currentChallengeIndex > 0) ? 
-                `<button id="prev-ch-button" style="background-color: #6c757d; color: white; padding: 10px 20px; border: none; border-radius: 4px; margin: 10px 10px;">← 前の課題へ</button>` : '';
-            const nextChButton = (currentChallengeIndex < CHALLENGE_DATA.length - 1) ? 
-                `<button id="next-ch-button" style="background-color: #2c3e50; color: white; padding: 10px 20px; border: none; border-radius: 4px; margin: 10px 10px;">次の課題へ →</button>` : '';
-
-
-            contentHTML = `
-                <h2>${title}</h2>
-                <p>現在取り組むべき課題を確認しましょう。(${currentChallengeIndex + 1}/${CHALLENGE_DATA.length})</p>
-                <div class="review-area" style="background-color: #2c3e50; border-left: 5px solid #00bcd4; padding: 20px;">
-                    <h3>${currentChallenge.title}</h3>
-                    <p><strong>対象ファイル:</strong> <code>${currentChallenge.file}</code></p>
-                    <p><strong>目的:</strong> ${currentChallenge.description}</p>
-                    
-                    <div style="margin-top: 20px; padding: 10px; background-color: #3e4c5e; border-radius: 4px;">
-                        <h4>🛠️ ヒントとキーワード</h4>
-                        <p><strong>キーワード:</strong> ${currentChallenge.keywords.join(' / ')}</p>
-                        <p><strong>ヒント:</strong> ${currentChallenge.hints}</p>
-                    </div>
-                </div>
-                
-                <div style="margin-top: 20px;">
-                    <button id="show-solution-button" style="background-color: #e74c3c; color: white; padding: 10px 20px; border: none; border-radius: 4px; margin: 10px 10px;">模範解答を表示</button>
-                    ${prevChButton}
-                    ${nextChButton}
-                </div>
-                
-                <div id="solution-container" class="code-area" style="display: none; margin-top: 20px; text-align: left;">
-                    <h4>模範解答 (${currentChallenge.file} の該当箇所)</h4>
-                    <pre id="solution-code" style="color: #ffffff; background-color: #1e1e1e; padding: 15px; border: 1px solid #555;"></pre>
-                </div>
-
-                <button class="back-button">← モード選択に戻る</button>
-            `;
-            break;
-    }
-
-    // appContainerのコンテンツを新しいものに置き換え
-    appContainer.innerHTML = contentHTML;
-
-    // --- モードに応じてリスナーを設定 ---
-    if (mode === 'practice') {
-        setupPracticeModeListeners();
-    } else if (mode === 'quiz' && chapterSelection === null) {
-        setupChapterSelectionListeners();
-    } else if (mode === 'quiz' && chapterSelection !== null) {
-        setupQuizListeners();
-        setupQuizNavigationListeners(); 
-        
-        document.getElementById('back-to-chapter-button').addEventListener('click', () => {
-            loadContent('quiz', null); 
-        });
-    } else if (mode === 'review') {
-        setupReviewNavigationListeners(); 
-    } else if (mode === 'challenge') { 
-        setupChallengeNavigationListeners();
-        setupChallengeSolutionListener();
-    }
-    
-    const backButton = document.querySelector('.back-button');
-    if (backButton && backButton.id !== 'back-to-chapter-button') {
-        backButton.addEventListener('click', showModeSelection);
-    }
-    
-    saveProgress();
-}
-
-
-// ===================================
-// 6. コード実行ロジック (Piston API利用版・安定版)
-// ===================================
-function setupPracticeModeListeners() {
-    const runButton = document.getElementById('run-button');
-    const javaCodeArea = document.getElementById('java-code');
-    const outputArea = document.getElementById('output-area');
-    
-    const API_ENDPOINT = "https://emkc.org/api/v2/piston/execute"; 
-    
-    if (runButton) {
-        runButton.addEventListener('click', () => {
-            const code = javaCodeArea.value;
-            outputArea.textContent = "RUNNING... (Executing code via external API)";
-            runButton.disabled = true; 
-
-            const requestBody = {
-                language: "java",
-                version: "15.0.2",
-                files: [
-                    {
-                        name: "Main.java",
-                        content: code
-                    }
-                ]
-            };
-
-            fetch(API_ENDPOINT, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(requestBody)
-            })
-            .then(response => response.json())
-            .then(data => {
-                let output = "";
-                
-                if (data.run && data.run.output) {
-                    output = data.run.output;
-                } else if (data.compile && data.compile.output) {
-                    output = `--- COMPILE ERROR ---\n${data.compile.output}`;
-                } else if (data.message) {
-                    output = `API Error: ${data.message}`;
-                } else {
-                    output = `Unknown Error.\n${JSON.stringify(data, null, 2)}`;
-                }
-
-                outputArea.textContent = `--- Output ---\n${output}`;
-            })
-            .catch(error => {
-                outputArea.textContent = `Error occurred: Check network connection.\n${error.message}`;
-                console.error("API Error:", error);
-            })
-            .finally(() => {
-                runButton.disabled = false;
-            });
-        });
-        
-        // 初期のコードのテンプレート
-        // 【修正】エンコーディングの問題を回避するため、日本語出力処理を削除
-        javaCodeArea.value = 
-`public class Main {
-    public static void main(String[] args) {
-        
-        // Your code starts here
-        int x = 5;
-        int y = 10;
-        
-        // Use English/ASCII characters for output to ensure stability
-        System.out.println("Result: " + (x + y)); 
-    }
-}`;
-    }
-}
-
-// ===================================
-// 7. クイズ解答ロジック
-// ===================================
-/**
- * クイズモードが読み込まれた後に、選択肢ボタンにイベントリスナーを設定する
- */
-function setupQuizListeners() {
-    const currentQuiz = QUIZ_DATA[currentQuizIndex]; 
-    
-    const optionButtons = document.querySelectorAll('.option-button');
-    const checkButton = document.getElementById('check-quiz-button');
-    const feedbackArea = document.getElementById('quiz-feedback');
-
-    let selectedAnswer = null;
-
-    // --- 選択肢のクリック処理 ---
-    optionButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            if (checkButton.disabled) return; 
-
-            optionButtons.forEach(btn => btn.classList.remove('selected'));
-            button.classList.add('selected');
-            selectedAnswer = button.textContent.trim(); 
-        });
-    });
-
-    // --- 解答チェックボタンのクリック処理 ---
-    checkButton.addEventListener('click', () => {
-        if (!selectedAnswer) {
-            feedbackArea.textContent = "回答を選択してください。"; 
-            feedbackArea.style.color = '#f39c12'; 
-            return;
-        }
-
-        checkButton.disabled = true; 
-        
-        // 正解のチェック
-        if (selectedAnswer === currentQuiz.correct_answer) {
-            feedbackArea.textContent = "✅ 正解です！素晴らしい！"; 
-            feedbackArea.style.color = '#2ecc71'; 
-        } else {
-            feedbackArea.textContent = `❌ 不正解です。正解は: ${currentQuiz.correct_answer}`; 
-            feedbackArea.style.color = '#e74c3c'; 
-        }
-        
-        // すべてのボタンのスタイルを更新
-        optionButtons.forEach(button => {
-            button.disabled = true; 
-            button.classList.remove('selected');
-
-            if (button.textContent.trim() === currentQuiz.correct_answer) {
-                button.style.backgroundColor = '#27ae60'; 
-            } else if (button.textContent.trim() === selectedAnswer && selectedAnswer !== currentQuiz.correct_answer) {
-                button.style.backgroundColor = '#c0392b';
-            }
-        });
-
-        // 詳細な解説を表示
-        const explanationHTML = `<p style="margin-top: 20px; padding: 10px; border: 1px dashed #555; background-color: #333;">
-            <strong>詳細な解説:</strong> ${currentQuiz.explanation}
-        </p>`; 
-        feedbackArea.insertAdjacentHTML('afterend', explanationHTML);
-    });
-}
-
-// ===================================
-// 8. 問題の切り替えロジック (クイズ/レビュー)
-// ===================================
-// クイズナビゲーションロジック
-function setupQuizNavigationListeners() {
-    const nextButton = document.getElementById('next-quiz-button');
-    const prevButton = document.getElementById('prev-quiz-button');
-    const targetChapterTitle = CHAPTER_TITLES[currentChapterId];
-    const chapterPrefix = targetChapterTitle.split('.')[0];
-    
-    // 次の問題のインデックスを探す (現在の章内の次の問題)
-    function findNextQuizIndex(currentIndex) {
-        for (let i = currentIndex + 1; i < QUIZ_DATA.length; i++) {
-            if (QUIZ_DATA[i].topic.startsWith(chapterPrefix)) {
-                return i;
-            } else {
-                return -1; // 章の終わり
-            }
-        }
-        return -1;
-    }
-    
-    // 前の問題のインデックスを探す (現在の章内の前の問題)
-    function findPrevQuizIndex(currentIndex) {
-        for (let i = currentIndex - 1; i >= 0; i--) {
-            if (QUIZ_DATA[i].topic.startsWith(chapterPrefix)) {
-                return i;
-            } else {
-                return -1; // 章の始まり
-            }
-        }
-        return -1;
-    }
-
-    if (nextButton) {
-        nextButton.addEventListener('click', () => {
-            const nextIndex = findNextQuizIndex(currentQuizIndex);
-            if (nextIndex !== -1) {
-                currentQuizIndex = nextIndex;
-                loadContent('quiz', currentChapterId); 
-            }
-        });
-    }
-
-    if (prevButton) {
-        prevButton.addEventListener('click', () => {
-            const prevIndex = findPrevQuizIndex(currentQuizIndex);
-            if (prevIndex !== -1) {
-                currentQuizIndex = prevIndex;
-                loadContent('quiz', currentChapterId);
-            }
-        });
-    }
-}
-
-
-function setupReviewNavigationListeners() {
-    const nextButton = document.getElementById('next-review-button');
-    const prevButton = document.getElementById('prev-review-button');
-
-    if (nextButton) {
-        nextButton.addEventListener('click', () => {
-            currentReviewIndex++;
-            loadContent('review'); 
-        });
-    }
-
-    if (prevButton) {
-        prevButton.addEventListener('click', () => {
-            currentReviewIndex--;
-            loadContent('review'); 
-        });
-    }
-}
-
-// ===================================
-// 9. 課題の切り替えロジック (チャレンジ)
-// ===================================
-function setupChallengeNavigationListeners() {
-    const nextButton = document.getElementById('next-ch-button');
-    const prevButton = document.getElementById('prev-ch-button');
-
-    if (nextButton) {
-        nextButton.addEventListener('click', () => {
-            currentChallengeIndex++;
-            loadContent('challenge'); 
-        });
-    }
-
-    if (prevButton) {
-        prevButton.addEventListener('click', () => {
-            currentChallengeIndex--;
-            loadContent('challenge'); 
-        });
-    }
-}
-
-// ===================================
-// 10. 模範解答表示ロジック
-// ===================================
-/**
- * 課題モードの模範解答表示ロジックを設定する
- */
-function setupChallengeSolutionListener() {
-    const solutionButton = document.getElementById('show-solution-button');
-    const solutionContainer = document.getElementById('solution-container');
-    const solutionCodeElement = document.getElementById('solution-code');
-    const currentChallenge = CHALLENGE_DATA[currentChallengeIndex];
-
-    if (solutionButton) {
-        solutionButton.addEventListener('click', () => {
-            solutionCodeElement.textContent = currentChallenge.solution_code;
-            solutionContainer.style.display = 'block';
-            solutionButton.disabled = true;
-            solutionButton.textContent = "解答表示済み";
-        });
-    }
-}
-
-
-// ===================================
-// 11. 章選択ロジック (新規追加)
-// ===================================
-function setupChapterSelectionListeners() {
-    const chapterButtons = document.querySelectorAll('.chapter-button');
-
-    chapterButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const chapterId = parseInt(button.dataset.chapterId);
-            
-            // 選択された章のIDを渡し、クイズのロードを開始
-            loadContent('quiz', chapterId);
-        });
-    });
-}
