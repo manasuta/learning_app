@@ -4,7 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CLA: Code Learning app for beginner</title>
-    <link rel="stylesheet" href="style.css">
+    <style>
+        /* --- CSS (デザイン定義) --- */
+        body {
+            font-family: 'Consolas', 'Monaco', monospace;
+            margin: 0; padding: 0;
+            background-color: #1e1e1e; color: #cccccc;
+            text-align: center;
+        }
+        header {
+            background-color: #000000; color: #ffffff;
+            padding: 30px 0; margin-bottom: 30px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+            border-bottom: 1px solid #333;
+        }
+        h1 { margin: 0; font-size: 2.2em; font-weight: normal; color: #00bcd4; }
+        p { font-size: 1em; opacity: 0.8; }
+        #app-container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        .mode-selection { display: flex; justify-content: center; gap: 25px; flex-wrap: wrap; }
+        .mode-button {
+            padding: 20px 30px; font-size: 1.15em; font-weight: bold; cursor: pointer;
+            border: 1px solid #555; border-radius: 4px; transition: all 0.3s;
+            flex: 1 1 280px; background-color: #333333; color: #ffffff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+        }
+        .mode-button:hover { transform: translateY(-2px); background-color: #444444; border-color: #00bcd4; }
+        #mode-practice { background-color: #1a7e78; }
+        #mode-quiz { background-color: #7d440c; }
+        #mode-review { background-color: #0a4f64; }
+        #mode-challenge { background-color: #3498db; }
+        
+        h2 { color: #00bcd4; border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 25px; font-weight: 500; }
+        .code-area, .quiz-area, .review-area {
+            background-color: #252526; padding: 20px; border-radius: 4px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); margin-top: 20px; text-align: left;
+        }
+        textarea#java-code {
+            width: 100%; height: 200px; background-color: #1e1e1e; color: #ffffff;
+            border: 1px solid #555; padding: 15px; font-family: 'Consolas', monospace;
+            font-size: 14px; resize: none; box-sizing: border-box;
+        }
+        #run-button {
+            background-color: #2ecc71; color: white; padding: 10px 20px; border: none;
+            border-radius: 4px; cursor: pointer; font-weight: bold; margin-top: 10px; width: 100%;
+        }
+        #run-button:hover { background-color: #27ae60; }
+        pre { background-color: #000000; color: #f1c40f; padding: 10px; border-radius: 4px; white-space: pre-wrap; overflow-x: auto; }
+        
+        .option-button, .back-button, .chapter-button, #check-quiz-button, #check-snippet-button, #start-solve-button, #show-solution-button, #next-ch, #prev-ch, #next-quiz-button, #prev-quiz-button {
+            padding: 10px 15px; margin: 5px; background-color: #34495e; color: white;
+            border: none; border-radius: 4px; cursor: pointer; transition: background-color 0.3s;
+        }
+        .option-button:hover, .back-button:hover, .chapter-button:hover { background-color: #44607d; }
+        .option-button.selected { border: 2px solid #00bcd4; background-color: #4a657e; }
+        #user-snippet-input {
+            width: 200px; padding: 5px; background: #333; border: 1px solid #555; color: #fff; font-family: monospace;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -14,13 +70,477 @@
 
     <main id="app-container">
         <div class="mode-selection">
-            <button id="mode-challenge" class="mode-button" style="background-color: #3498db; color: white;">📚 課題ステップ学習</button>
+            <button id="mode-challenge" class="mode-button">📚 課題ステップ学習</button>
             <button id="mode-practice" class="mode-button">🚀 コード入力・実行モード</button>
             <button id="mode-quiz" class="mode-button">❓ クイズ・選択式モード</button>
             <button id="mode-review" class="mode-button">📚 復習・解説表示モード</button>
         </div>
     </main>
 
-    <script src="main.js" defer></script>
+    <script>
+        // ===================================
+        // 1. データ定義 (全データ統合)
+        // ===================================
+
+        const CHALLENGE_DATA = [
+            {
+                id: 1, title: "課題2-1: FiveEvenNumbers", file: "FiveEvenNumbers.java",
+                description: "長さ5の int 型配列を定義し、0から始まる最初の5つの偶数を格納し、表示します。",
+                keywords: ["配列宣言", "forループ", "偶数計算"], hints: "配列のサイズは new int[5] で固定です。",
+                solution_code: `public FiveEvenNumbers(){ even = new int[5]; for(int i=0; i<5; i++){ even[i] = i * 2; } }`,
+                challenge_code: `public FiveEvenNumbers() { even = new int[5]; for (int i=0; i < 5; i++) { even[i] = [SNIPPET_HERE]; } }`,
+                correct_snippet: "i * 2"
+            },
+            {
+                id: 2, title: "課題2-2: EvenNumbers", file: "EvenNumbers.java",
+                description: "引数でサイズを受け取る配列を作成し、偶数を格納します。",
+                keywords: ["可変長配列", "コンストラクタ引数"], hints: "コンストラクタの引数 size を使って配列を初期化します。",
+                solution_code: `public EvenNumbers(int size){ even = new int[size]; for(int i=0; i<size;i++){ even[i] = i * 2; } }`,
+                challenge_code: `public EvenNumbers(int size) { even = new int[size]; for (int i=0; i < size; i++) { even[i] = [SNIPPET_HERE]; } }`,
+                correct_snippet: "i * 2"
+            },
+            {
+                id: 3, title: "課題2-3: FourNames", file: "FourNames.java",
+                description: "文字列配列を操作し、範囲外アクセスを防止するメソッドを実装します。",
+                keywords: ["文字列配列", "null", "範囲チェック"], hints: "添字が 0 以上かつ length 未満か確認します。",
+                solution_code: `public String getName(int idx){ if (idx >= 0 && idx < this.names.length) return this.names[idx]; else return null; }`,
+                challenge_code: `public String getName(int idx) { if (idx >= 0 && idx < names.length) return names[idx]; else return [SNIPPET_HERE]; }`,
+                correct_snippet: "null"
+            },
+            {
+                id: 4, title: "課題2-4: MaxMinAndSumOfNumbers", file: "MaxMinAndSumOfNumbers.java",
+                description: "配列内の最大値を求めるメソッドを実装します。",
+                keywords: ["最大値", "比較演算子"], hints: "現在の最大値 currentMax と要素を比較します。",
+                solution_code: `public int max() { if (numbers.length==0) return Integer.MIN_VALUE; int m=numbers[0]; for(int i=1;i<numbers.length;i++) if(numbers[i]>m) m=numbers[i]; return m; }`,
+                challenge_code: `public int max() { int currentMax = numbers[0]; for (int i = 1; i < numbers.length; i++) { if ([SNIPPET_HERE]) { currentMax = numbers[i]; } } return currentMax; }`,
+                correct_snippet: "this.numbers[i] > currentMax"
+            },
+            {
+                id: 5, title: "課題5-1: Lectureクラス", file: "Lecture.java",
+                description: "isValidDayメソッドで曜日が有効（nullでない）かチェックします。",
+                keywords: ["nullチェック", "this"], hints: "day フィールドが null でないことを返します。",
+                solution_code: `public boolean isValidDay() { return this.day != null; }`,
+                challenge_code: `public boolean isValidDay() { return [SNIPPET_HERE]; }`,
+                correct_snippet: "this.day != null"
+            },
+            {
+                id: 6, title: "課題5-2: TimeTable", file: "TimeTable.java",
+                description: "isDayRegisteredメソッドで、曜日がHashMapに登録済みか確認します。",
+                keywords: ["HashMap", "containsKey"], hints: "timetable.containsKey(day) を使用します。",
+                solution_code: `public boolean isDayRegistered(String day) { return timetable.containsKey(day); }`,
+                challenge_code: `public boolean isDayRegistered (String day) { return [SNIPPET_HERE]; }`,
+                correct_snippet: "timetable.containsKey(day)"
+            },
+            {
+                id: 7, title: "課題5-3: showLecturesOfRoom", file: "TimeTable.java",
+                description: "指定された教室の授業を表示します（線形探索）。",
+                keywords: ["equals", "文字列比較"], hints: "授業の教室名と引数のroomを比較します。",
+                solution_code: `if(lec.getRoom().equals(room))`,
+                challenge_code: `if ([SNIPPET_HERE]) { System.out.println(lec); }`,
+                correct_snippet: "lec.getRoom().equals(room)"
+            },
+            {
+                id: 8, title: "課題5-4: showLecturesByName...", file: "TimeTable.java",
+                description: "授業名、教室、教員名で検索する際の条件式を実装します。",
+                keywords: ["複合条件", "OR演算子"], hints: "「引数が空文字」または「名前が一致」の条件を作ります。",
+                solution_code: `if ((name.equals("") || lec.getName().equals(name)) && ...)`,
+                challenge_code: `if (([SNIPPET_HERE]) && (room.equals("") || ...) && ...) { ... }`,
+                correct_snippet: "name.equals(\"\") || lec.getName().equals(name)"
+            },
+            {
+                id: 9, title: "課題5-5: removeLecture", file: "TimeTable.java",
+                description: "授業削除後、リストが空になったらエントリを削除する判定を行います。",
+                keywords: ["isEmpty", "size"], hints: "リストのサイズが0、またはisEmpty()を使います。",
+                solution_code: `if(lectures.isEmpty()) { timetable.remove(day); }`,
+                challenge_code: `if ([SNIPPET_HERE]) { timetable.remove(day); }`,
+                correct_snippet: "lectures.size() == 0"
+            },
+            {
+                id: 10, title: "課題5-6: showLecturesOfRoomIndexed", file: "TimeTable.java",
+                description: "逆引きインデックスを使って授業リストを取得し、ループで表示します。",
+                keywords: ["拡張for文", "ArrayList"], hints: "取得した list をループさせます。",
+                solution_code: `for (Lecture lec : list) { System.out.println(lec); }`,
+                challenge_code: `for (Lecture lec : [SNIPPET_HERE]) { System.out.println(lec); }`,
+                correct_snippet: "list"
+            },
+            {
+                id: 11, title: "課題6-1: MyStack.pop", file: "MyStack.java",
+                description: "スタックの末尾から要素を削除して取得します。",
+                keywords: ["ArrayList", "remove"], hints: "remove(index) メソッドを使います。",
+                solution_code: `return stack.remove(stack.size() - 1);`,
+                challenge_code: `int index = stack.size() - 1; return stack.[SNIPPET_HERE];`,
+                correct_snippet: "remove(index)"
+            },
+            {
+                id: 12, title: "課題6-2: RPNCalc", file: "RPNCalc.java",
+                description: "逆ポーランド記法計算機で、数値トークンをスタックに積みます。",
+                keywords: ["Integer.parseInt", "push"], hints: "word を整数に変換します。",
+                solution_code: `stack.push(Integer.parseInt(word));`,
+                challenge_code: `stack.push(Integer.parseInt([SNIPPET_HERE]));`,
+                correct_snippet: "word"
+            },
+            {
+                id: 13, title: "課題6-3: SolveMaze", file: "SolveMaze.java",
+                description: "迷路探索で、左右の移動時に行が変わっていないか（回り込み防止）をチェックします。",
+                keywords: ["境界チェック", "行の計算"], hints: "次の行と現在の行が等しくない場合。",
+                solution_code: `if (nextRow != currentRow) continue;`,
+                challenge_code: `if ([SNIPPET_HERE]) { continue; }`,
+                correct_snippet: "nextRow != currentRow"
+            },
+            {
+                id: 14, title: "課題7-1: Student.setStudentID", file: "Student.java",
+                description: "学籍番号をセットし、それをシードにして乱数オブジェクトを初期化します。",
+                keywords: ["Random", "初期化"], hints: "studentID をコンストラクタに渡します。",
+                solution_code: `this.randBrain = new Random(studentID);`,
+                challenge_code: `randBrain = new Random([SNIPPET_HERE]);`,
+                correct_snippet: "studentID"
+            },
+            {
+                id: 15, title: "課題7-2: Office.retrieveScore", file: "Office.java",
+                description: "OfficeからSubjectへ処理を委譲し、点数を取得します。",
+                keywords: ["委譲", "getScore"], hints: "subject.getScore(student) を呼び出します。",
+                solution_code: `return subject.getScore(student);`,
+                challenge_code: `return (subject == null) ? -1 : subject.[SNIPPET_HERE];`,
+                correct_snippet: "getScore(student)"
+            },
+            {
+                id: 16, title: "課題7-5: Teacher.showDisqualified", file: "Teacher.java",
+                description: "点数が60点未満の場合に落単として表示する条件式です。",
+                keywords: ["比較演算子", "未満"], hints: "60より小さい。",
+                solution_code: `if (sc >= 0 && sc < 60)`,
+                challenge_code: `if (sc >= 0 && sc < [SNIPPET_HERE]) { ... }`,
+                correct_snippet: "60"
+            },
+            {
+                id: 17, title: "課題8: StateMachine", file: "R08_YY_NNNN.java",
+                description: "状態遷移テーブルから次の状態を取得します。",
+                keywords: ["HashMap", "get"], hints: "stateMachine.get(currentState).get(pushedButton)",
+                solution_code: `nextState = stateMachine.get(currentState).get(pushedButton);`,
+                challenge_code: `nextState = [SNIPPET_HERE];`,
+                correct_snippet: "stateMachine.get(currentState).get(pushedButton)"
+            }
+        ];
+
+        // 章タイトル
+        const CHAPTER_TITLES = [
+            "1. オブジェクト生成とメソッド呼び出し", "2. クラスの定義", "3. 基本的な処理の記述",
+            "4. 様々なデータ構造", "5. メッセージパッシング・委譲", "6. 継承・抽象クラス",
+            "7. インタフェース", "8. クラス定義に関する諸技術", "9. ファイル操作", "10. ラムダ式とストリーム"
+        ];
+
+        // クイズデータ（全100問）
+        const QUIZ_DATA = [
+            // Chapter 1
+            { id: 1, topic: "1. オブジェクト生成", question: "クラスのインスタンスを生成するキーワードは？", code_example: "___ MyClass();", options: ["new", "create", "make", "init"], correct_answer: "new", explanation: "new演算子でコンストラクタを呼び出し、インスタンスを生成します。" },
+            { id: 2, topic: "1. オブジェクト生成", question: "メソッド呼び出しに使う演算子は？", code_example: "obj___method()", options: [".", "->", "::", ":"], correct_answer: ".", explanation: "ドット演算子(.)を使ってメンバにアクセスします。" },
+            { id: 3, topic: "1. オブジェクト生成", question: "再代入不可能な変数を作る修飾子は？", code_example: "___ int x = 10;", options: ["final", "static", "const", "void"], correct_answer: "final", explanation: "final修飾子をつけると定数となり、再代入できません。" },
+            { id: 4, topic: "1. オブジェクト生成", question: "倍精度浮動小数点数の型は？", code_example: "___ d = 3.14;", options: ["double", "float", "int", "long"], correct_answer: "double", explanation: "実数はdoubleが基本です。" },
+            { id: 5, topic: "1. オブジェクト生成", question: "「より大きい」を表す比較演算子は？", code_example: "if(a ___ b)", options: [">", "<", ">=", "="], correct_answer: ">", explanation: "> はGreater Thanです。" },
+            { id: 6, topic: "1. オブジェクト生成", question: "戻り値がないメソッドの型は？", code_example: "___ func() {}", options: ["void", "null", "int", "empty"], correct_answer: "void", explanation: "voidは戻り値なしを表します。" },
+            { id: 7, topic: "1. オブジェクト生成", question: "改行付き出力メソッドは？", code_example: "System.out.___(str);", options: ["println", "print", "printf", "write"], correct_answer: "println", explanation: "printlnは出力後に改行を行います。" },
+            { id: 8, topic: "1. オブジェクト生成", question: "真偽値を表す型は？", code_example: "___ flag = true;", options: ["boolean", "bool", "int", "bit"], correct_answer: "boolean", explanation: "true/falseはboolean型です。" },
+            { id: 9, topic: "1. オブジェクト生成", question: "文字列を扱うクラスは？", code_example: "___ s = \"hello\";", options: ["String", "Char", "Text", "Str"], correct_answer: "String", explanation: "JavaではStringクラスを使います。" },
+            { id: 10, topic: "1. オブジェクト生成", question: "メソッドに渡す値の名称は？", code_example: "func(値)", options: ["引数", "戻り値", "変数", "定数"], correct_answer: "引数", explanation: "Argument（引数）と呼びます。" },
+            
+            // Chapter 2
+            { id: 11, topic: "2. クラスの定義", question: "プログラム開始メソッドは？", code_example: "public static void ___", options: ["main", "start", "run", "init"], correct_answer: "main", explanation: "mainメソッドがエントリポイントです。" },
+            { id: 12, topic: "2. クラスの定義", question: "初期化用メソッドは？", code_example: "new MyClass()", options: ["コンストラクタ", "イニシャライザ", "セッター", "メイン"], correct_answer: "コンストラクタ", explanation: "new時にコンストラクタが呼ばれます。" },
+            { id: 13, topic: "2. クラスの定義", question: "クラスが持つ変数は？", code_example: "class A { int x; }", options: ["フィールド", "ローカル変数", "引数", "グローバル"], correct_answer: "フィールド", explanation: "メンバ変数をフィールドと呼びます。" },
+            { id: 14, topic: "2. クラスの定義", question: "自インスタンスを指すのは？", code_example: "___ .x = x;", options: ["this", "self", "me", "super"], correct_answer: "this", explanation: "thisは現在のインスタンス自身を参照します。" },
+            { id: 15, topic: "2. クラスの定義", question: "メソッド内だけの変数は？", code_example: "void f() { int i; }", options: ["ローカル変数", "フィールド", "静的変数", "定数"], correct_answer: "ローカル変数", explanation: "スコープがメソッド内に限定されます。" },
+            { id: 16, topic: "2. クラスの定義", question: "同名で引数が違うメソッド定義は？", code_example: "f(int a), f(double b)", options: ["オーバーロード", "オーバーライド", "継承", "多態性"], correct_answer: "オーバーロード", explanation: "多重定義（オーバーロード）です。" },
+            { id: 17, topic: "2. クラスの定義", question: "値を設定するメソッドは？", code_example: "___Value()", options: ["set", "get", "put", "add"], correct_answer: "set", explanation: "Setter（セッター）です。" },
+            { id: 18, topic: "2. クラスの定義", question: "値を取得するメソッドは？", code_example: "___Value()", options: ["get", "set", "read", "take"], correct_answer: "get", explanation: "Getter（ゲッター）です。" },
+            { id: 19, topic: "2. クラスの定義", question: "複数行コメントは？", code_example: "", options: ["/* */", "//", "#", ""], correct_answer: "/* */", explanation: "/* ... */ で囲みます。" },
+            { id: 20, topic: "2. クラスの定義", question: "Javadocコメントは？", code_example: "", options: ["/** */", "/* */", "//", "#"], correct_answer: "/** */", explanation: "/** ... */ です。" },
+            
+            // Chapter 3
+            { id: 21, topic: "3. 基本的な処理の記述", question: "入力を受け取るクラスは？", code_example: "", options: ["Scanner", "Reader", "Input", "System"], correct_answer: "Scanner", explanation: "java.util.Scannerを使います。" },
+            { id: 22, topic: "3. 基本的な処理の記述", question: "1増やす演算子は？", code_example: "i___", options: ["++", "+=", "--", "**"], correct_answer: "++", explanation: "インクリメント演算子です。" },
+            { id: 23, topic: "3. 基本的な処理の記述", question: "論理積（かつ）は？", code_example: "A ___ B", options: ["&&", "||", "!", "&"], correct_answer: "&&", explanation: "AND演算子です。" },
+            { id: 24, topic: "3. 基本的な処理の記述", question: "多分岐構文は？", code_example: "___(val) { case 1: ... }", options: ["switch", "if", "for", "while"], correct_answer: "switch", explanation: "switch文です。" },
+            { id: 25, topic: "3. 基本的な処理の記述", question: "回数指定ループは？", code_example: "___(int i=0;...)", options: ["for", "while", "if", "switch"], correct_answer: "for", explanation: "for文です。" },
+            { id: 26, topic: "3. 基本的な処理の記述", question: "ループ脱出は？", code_example: "", options: ["break", "continue", "exit", "return"], correct_answer: "break", explanation: "break文で抜けます。" },
+            { id: 27, topic: "3. 基本的な処理の記述", question: "次の反復へスキップは？", code_example: "", options: ["continue", "break", "next", "pass"], correct_answer: "continue", explanation: "continue文です。" },
+            { id: 28, topic: "3. 基本的な処理の記述", question: "文字列比較メソッドは？", code_example: "s1.___(s2)", options: ["equals", "==", "match", "same"], correct_answer: "equals", explanation: "equals()を使います。" },
+            { id: 29, topic: "3. 基本的な処理の記述", question: "文字列長取得は？", code_example: "s.___", options: ["length()", "size()", "len", "count"], correct_answer: "length()", explanation: "length()メソッドです。" },
+            { id: 30, topic: "3. 基本的な処理の記述", question: "文字結合演算子は？", code_example: "\"A\" ___ \"B\"", options: ["+", "&", ".", "concat"], correct_answer: "+", explanation: "+演算子で結合できます。" },
+
+            // Chapter 4
+            { id: 31, topic: "4. 様々なデータ構造", question: "配列生成構文は？", code_example: "new int___", options: ["[5]", "(5)", "{5}", "<5>"], correct_answer: "[5]", explanation: "[]でサイズを指定します。" },
+            { id: 32, topic: "4. 様々なデータ構造", question: "配列の要素数は？", code_example: "arr.___", options: ["length", "size", "count", "getLen"], correct_answer: "length", explanation: "lengthフィールドです。" },
+            { id: 33, topic: "4. 様々なデータ構造", question: "可変長リストは？", code_example: "", options: ["ArrayList", "Array", "FixedList", "Vector"], correct_answer: "ArrayList", explanation: "ArrayListクラスです。" },
+            { id: 34, topic: "4. 様々なデータ構造", question: "リスト追加メソッドは？", code_example: "list.___(item)", options: ["add", "push", "put", "insert"], correct_answer: "add", explanation: "add()です。" },
+            { id: 35, topic: "4. 様々なデータ構造", question: "リスト要素数取得は？", code_example: "list.___", options: ["size()", "length", "count()", "len"], correct_answer: "size()", explanation: "size()メソッドです。" },
+            { id: 36, topic: "4. 様々なデータ構造", question: "キーと値のペアは？", code_example: "", options: ["HashMap", "ArrayList", "Set", "Queue"], correct_answer: "HashMap", explanation: "HashMapです。" },
+            { id: 37, topic: "4. 様々なデータ構造", question: "マップへの保存は？", code_example: "map.___(key, val)", options: ["put", "add", "set", "push"], correct_answer: "put", explanation: "put()です。" },
+            { id: 38, topic: "4. 様々なデータ構造", question: "intのラッパークラスは？", code_example: "", options: ["Integer", "Int", "Number", "Double"], correct_answer: "Integer", explanation: "Integerクラスです。" },
+            { id: 39, topic: "4. 様々なデータ構造", question: "コレクション用ループは？", code_example: "for(T e : list)", options: ["拡張for文", "while", "do-while", "if"], correct_answer: "拡張for文", explanation: "拡張for文(for-each)です。" },
+            { id: 40, topic: "4. 様々なデータ構造", question: "範囲外アクセスの例外は？", code_example: "", options: ["ArrayIndexOutOfBoundsException", "NullPointerException", "IOException", "Error"], correct_answer: "ArrayIndexOutOfBoundsException", explanation: "インデックス範囲外の例外です。" },
+
+            // Chapter 5
+            { id: 41, topic: "5. メッセージパッシング・委譲", question: "メソッド呼び出しの別名は？", code_example: "", options: ["メッセージパッシング", "継承", "ポリモーフィズム", "カプセル化"], correct_answer: "メッセージパッシング", explanation: "オブジェクトへのメッセージ送信とみなします。" },
+            { id: 42, topic: "5. メッセージパッシング・委譲", question: "処理を他オブジェクトに任せるのは？", code_example: "", options: ["委譲", "継承", "実装", "オーバーロード"], correct_answer: "委譲", explanation: "Delegation（委譲）です。" },
+            { id: 43, topic: "5. メッセージパッシング・委譲", question: "Has-a関係とは？", code_example: "", options: ["持っている", "継承している", "同じである", "実装している"], correct_answer: "持っている", explanation: "フィールドとして保持する関係です。" },
+            { id: 44, topic: "5. メッセージパッシング・委譲", question: "データ隠蔽の概念は？", code_example: "", options: ["カプセル化", "抽象化", "継承", "多態性"], correct_answer: "カプセル化", explanation: "外部からの直接アクセスを防ぎます。" },
+            { id: 45, topic: "5. メッセージパッシング・委譲", question: "公開アクセス修飾子は？", code_example: "", options: ["public", "private", "protected", "void"], correct_answer: "public", explanation: "どこからでもアクセス可能です。" },
+            { id: 46, topic: "5. メッセージパッシング・委譲", question: "非公開アクセス修飾子は？", code_example: "", options: ["private", "public", "static", "final"], correct_answer: "private", explanation: "自クラス内のみアクセス可能です。" },
+            { id: 47, topic: "5. メッセージパッシング・委譲", question: "委譲のメリットは？", code_example: "", options: ["結合度を下げる", "コードが短くなる", "処理が遅くなる", "メモリ節約"], correct_answer: "結合度を下げる", explanation: "継承より柔軟な構成が可能です。" },
+            { id: 48, topic: "5. メッセージパッシング・委譲", question: "DIとは？", code_example: "", options: ["依存性の注入", "データ入力", "直接継承", "二重継承"], correct_answer: "依存性の注入", explanation: "Dependency Injectionです。" },
+            { id: 49, topic: "5. メッセージパッシング・委譲", question: "Getterの命名は？", code_example: "name -> ___", options: ["getName", "name", "fetchName", "takeName"], correct_answer: "getName", explanation: "get + キャメルケースです。" },
+            { id: 50, topic: "5. メッセージパッシング・委譲", question: "Setterの命名は？", code_example: "name -> ___", options: ["setName", "putName", "inputName", "changeName"], correct_answer: "setName", explanation: "set + キャメルケースです。" },
+
+            // Chapter 6
+            { id: 51, topic: "6. 継承・抽象クラス", question: "継承キーワードは？", code_example: "", options: ["extends", "implements", "inherits", "super"], correct_answer: "extends", explanation: "extendsを使います。" },
+            { id: 52, topic: "6. 継承・抽象クラス", question: "メソッド上書きは？", code_example: "", options: ["オーバーライド", "オーバーロード", "コピー", "リライト"], correct_answer: "オーバーライド", explanation: "Overrideです。" },
+            { id: 53, topic: "6. 継承・抽象クラス", question: "親クラス参照キーワードは？", code_example: "", options: ["super", "this", "parent", "base"], correct_answer: "super", explanation: "superを使います。" },
+            { id: 54, topic: "6. 継承・抽象クラス", question: "抽象クラスキーワードは？", code_example: "", options: ["abstract", "virtual", "static", "void"], correct_answer: "abstract", explanation: "abstract classです。" },
+            { id: 55, topic: "6. 継承・抽象クラス", question: "全クラスの祖先は？", code_example: "", options: ["Object", "Main", "Root", "Class"], correct_answer: "Object", explanation: "java.lang.Objectです。" },
+            { id: 56, topic: "6. 継承・抽象クラス", question: "Is-a関係とは？", code_example: "", options: ["一種である", "持っている", "使っている", "似ている"], correct_answer: "一種である", explanation: "継承関係を表します。" },
+            { id: 57, topic: "6. 継承・抽象クラス", question: "多態性は？", code_example: "", options: ["ポリモーフィズム", "カプセル化", "継承", "抽象化"], correct_answer: "ポリモーフィズム", explanation: "Polymorphismです。" },
+            { id: 58, topic: "6. 継承・抽象クラス", question: "多重継承は？", code_example: "", options: ["禁止", "許可", "条件付", "推奨"], correct_answer: "禁止", explanation: "クラスの多重継承はできません。" },
+            { id: 59, topic: "6. 継承・抽象クラス", question: "継承禁止修飾子は？", code_example: "", options: ["final", "static", "private", "void"], correct_answer: "final", explanation: "finalクラスは継承できません。" },
+            { id: 60, topic: "6. 継承・抽象クラス", question: "型チェック演算子は？", code_example: "", options: ["instanceof", "typeof", "is", "as"], correct_answer: "instanceof", explanation: "obj instanceof Class で確認します。" },
+
+            // Chapter 7
+            { id: 61, topic: "7. インタフェース", question: "定義キーワードは？", code_example: "", options: ["interface", "class", "struct", "impl"], correct_answer: "interface", explanation: "interfaceです。" },
+            { id: 62, topic: "7. インタフェース", question: "実装キーワードは？", code_example: "", options: ["implements", "extends", "using", "apply"], correct_answer: "implements", explanation: "implementsです。" },
+            { id: 63, topic: "7. インタフェース", question: "メソッドのデフォルト修飾子は？", code_example: "", options: ["public abstract", "private", "protected", "final"], correct_answer: "public abstract", explanation: "public abstractとみなされます。" },
+            { id: 64, topic: "7. インタフェース", question: "実装付きメソッドは？", code_example: "", options: ["default", "static", "final", "concrete"], correct_answer: "default", explanation: "defaultメソッドです。" },
+            { id: 65, topic: "7. インタフェース", question: "多重実装は？", code_example: "", options: ["可能", "不可能", "非推奨", "エラー"], correct_answer: "可能", explanation: "複数のインターフェースを実装可能です。" },
+            { id: 66, topic: "7. インタフェース", question: "定数の修飾子は？", code_example: "", options: ["public static final", "private", "var", "const"], correct_answer: "public static final", explanation: "自動的に定数になります。" },
+            { id: 67, topic: "7. インタフェース", question: "インスタンス化は？", code_example: "", options: ["不可", "可", "条件付", "推奨"], correct_answer: "不可", explanation: "直接newできません。" },
+            { id: 68, topic: "7. インタフェース", question: "継承と併用は？", code_example: "", options: ["可能", "不可能", "順序による", "エラー"], correct_answer: "可能", explanation: "extendsとimplementsは併用できます。" },
+            { id: 69, topic: "7. インタフェース", question: "役割は？", code_example: "", options: ["仕様の定義", "実装の共有", "データ保持", "高速化"], correct_answer: "仕様の定義", explanation: "契約（仕様）を定義します。" },
+            { id: 70, topic: "7. インタフェース", question: "インターフェース間の継承は？", code_example: "", options: ["可能", "不可能", "implements", "不可"], correct_answer: "可能", explanation: "extendsで継承可能です。" },
+
+            // Chapter 8
+            { id: 71, topic: "8. クラス定義に関する諸技術", question: "クラスに属するメンバは？", code_example: "", options: ["static", "final", "void", "new"], correct_answer: "static", explanation: "静的メンバです。" },
+            { id: 72, topic: "8. クラス定義に関する諸技術", question: "パッケージプライベートは？", code_example: "", options: ["修飾子なし", "private", "public", "protected"], correct_answer: "修飾子なし", explanation: "デフォルトのアクセスレベルです。" },
+            { id: 73, topic: "8. クラス定義に関する諸技術", question: "継承先からアクセス可能なのは？", code_example: "", options: ["protected", "private", "default", "final"], correct_answer: "protected", explanation: "protectedです。" },
+            { id: 74, topic: "8. クラス定義に関する諸技術", question: "パッケージ宣言は？", code_example: "", options: ["package", "import", "include", "namespace"], correct_answer: "package", explanation: "ファイルの先頭に書きます。" },
+            { id: 75, topic: "8. クラス定義に関する諸技術", question: "クラス取り込みは？", code_example: "", options: ["import", "using", "include", "require"], correct_answer: "import", explanation: "import文です。" },
+            { id: 76, topic: "8. クラス定義に関する諸技術", question: "定数の修飾子は？", code_example: "", options: ["static final", "public void", "abstract", "const"], correct_answer: "static final", explanation: "定数はstatic finalです。" },
+            { id: 77, topic: "8. クラス定義に関する諸技術", question: "列挙型は？", code_example: "", options: ["enum", "class", "interface", "struct"], correct_answer: "enum", explanation: "enum型です。" },
+            { id: 78, topic: "8. クラス定義に関する諸技術", question: "文字列表現メソッドは？", code_example: "", options: ["toString", "string", "text", "print"], correct_answer: "toString", explanation: "toString()です。" },
+            { id: 79, topic: "8. クラス定義に関する諸技術", question: "定数の命名規則は？", code_example: "", options: ["大文字と_", "キャメル", "パスカル", "小文字"], correct_answer: "大文字と_", explanation: "SNAKE_CASE（大文字）です。" },
+            { id: 80, topic: "8. クラス定義に関する諸技術", question: "オートボクシングとは？", code_example: "", options: ["自動型変換", "エラー", "手動変換", "キャスト"], correct_answer: "自動型変換", explanation: "基本型⇔ラッパークラスの自動変換です。" },
+
+            // Chapter 9
+            { id: 81, topic: "9. ファイル操作", question: "例外捕捉構文は？", code_example: "", options: ["try-catch", "if-else", "switch", "for"], correct_answer: "try-catch", explanation: "try-catchです。" },
+            { id: 82, topic: "9. ファイル操作", question: "必ず実行されるブロックは？", code_example: "", options: ["finally", "catch", "else", "end"], correct_answer: "finally", explanation: "finallyブロックです。" },
+            { id: 83, topic: "9. ファイル操作", question: "ファイルクラスは？", code_example: "", options: ["File", "Path", "Dir", "IO"], correct_answer: "File", explanation: "java.io.Fileです。" },
+            { id: 84, topic: "9. ファイル操作", question: "自動クローズ構文は？", code_example: "", options: ["try-with-resources", "auto-close", "using", "finally"], correct_answer: "try-with-resources", explanation: "try(Resource r = ...){} です。" },
+            { id: 85, topic: "9. ファイル操作", question: "入出力例外は？", code_example: "", options: ["IOException", "NullPointer", "IndexOut", "Sql"], correct_answer: "IOException", explanation: "IOExceptionです。" },
+            { id: 86, topic: "9. ファイル操作", question: "行読み込みクラスは？", code_example: "", options: ["BufferedReader", "FileReader", "Scanner", "LineReader"], correct_answer: "BufferedReader", explanation: "BufferedReaderが効率的です。" },
+            { id: 87, topic: "9. ファイル操作", question: "例外宣言キーワードは？", code_example: "", options: ["throws", "throw", "catch", "try"], correct_answer: "throws", explanation: "メソッド定義にthrowsを書きます。" },
+            { id: 88, topic: "9. ファイル操作", question: "例外送出キーワードは？", code_example: "", options: ["throw", "throws", "raise", "new"], correct_answer: "throw", explanation: "throw new Exception() です。" },
+            { id: 89, topic: "9. ファイル操作", question: "パス区切り文字は？", code_example: "", options: ["File.separator", "/", "\\", "|"], correct_answer: "File.separator", explanation: "OS依存の区切り文字です。" },
+            { id: 90, topic: "9. ファイル操作", question: "スタックトレース表示は？", code_example: "", options: ["printStackTrace", "printError", "log", "trace"], correct_answer: "printStackTrace", explanation: "e.printStackTrace()です。" },
+
+            // Chapter 10
+            { id: 91, topic: "10. ラムダ式とストリーム", question: "ラムダ演算子は？", code_example: "", options: ["->", "=>", "::", ":"], correct_answer: "->", explanation: "アロー演算子です。" },
+            { id: 92, topic: "10. ラムダ式とストリーム", question: "メソッド参照は？", code_example: "", options: ["::", "->", ".", "&"], correct_answer: "::", explanation: "ダブルコロンです。" },
+            { id: 93, topic: "10. ラムダ式とストリーム", question: "ストリーム生成は？", code_example: "", options: ["stream()", "list()", "flow()", "seq()"], correct_answer: "stream()", explanation: "collection.stream()です。" },
+            { id: 94, topic: "10. ラムダ式とストリーム", question: "フィルタリングは？", code_example: "", options: ["filter", "map", "reduce", "each"], correct_answer: "filter", explanation: "filter()メソッドです。" },
+            { id: 95, topic: "10. ラムダ式とストリーム", question: "要素変換は？", code_example: "", options: ["map", "change", "filter", "convert"], correct_answer: "map", explanation: "map()メソッドです。" },
+            { id: 96, topic: "10. ラムダ式とストリーム", question: "全要素処理は？", code_example: "", options: ["forEach", "loop", "all", "each"], correct_answer: "forEach", explanation: "forEach()です。" },
+            { id: 97, topic: "10. ラムダ式とストリーム", question: "遅延評価されるのは？", code_example: "", options: ["中間操作", "終端操作", "生成", "定義"], correct_answer: "中間操作", explanation: "中間操作は終端操作まで実行されません。" },
+            { id: 98, topic: "10. ラムダ式とストリーム", question: "結果をまとめるのは？", code_example: "", options: ["collect", "gather", "list", "group"], correct_answer: "collect", explanation: "collect()です。" },
+            { id: 99, topic: "10. ラムダ式とストリーム", question: "関数型IFの抽象メソッド数は？", code_example: "", options: ["1", "0", "2", "任意"], correct_answer: "1", explanation: "単一の抽象メソッドを持ちます。" },
+            { id: 100, topic: "10. ラムダ式とストリーム", question: "値を供給するIFは？", code_example: "", options: ["Supplier", "Consumer", "Function", "Predicate"], correct_answer: "Supplier", explanation: "Supplierです。" }
+        ];
+
+        const REVIEW_DATA = [
+            {
+                id: 1,
+                topic: "基本出力",
+                title: "Hello Worldとコンソール出力",
+                code_example: `public class Hello {\n    public static void main(String[] args) {\n        System.out.println("CLAで学習中！");\n    }\n}`,
+                explanation: "**System.out.println** メソッドは、引数を出力した後、改行します。**System.out.print** は改行しません。"
+            },
+            // ... (他レビューデータは省略せず、必要なら追加)
+        ];
+
+        // ===================================
+        // 2. 状態管理
+        // ===================================
+        let currentQuizIndex = 0;
+        let currentChallengeIndex = 0;
+        let currentChapterId = null;
+        let currentReviewIndex = 0;
+
+        // ローカルストレージ保存
+        function saveProgress() {
+            try {
+                const progress = { quiz: currentQuizIndex, review: currentReviewIndex, challenge: currentChallengeIndex };
+                localStorage.setItem('claAppProgress', JSON.stringify(progress));
+            } catch (e) { console.error("Save failed", e); }
+        }
+
+        // ローカルストレージ読み込み
+        function loadProgress() {
+            try {
+                const saved = localStorage.getItem('claAppProgress');
+                if (saved) {
+                    const progress = JSON.parse(saved);
+                    currentQuizIndex = progress.quiz || 0;
+                    currentReviewIndex = progress.review || 0;
+                    currentChallengeIndex = progress.challenge || 0;
+                }
+            } catch (e) { console.error("Load failed", e); }
+        }
+
+        // ===================================
+        // 3. メインロジック
+        // ===================================
+        function loadContent(mode, arg = null) {
+            const app = document.getElementById('app-container');
+            let html = '';
+
+            if (mode === 'practice') {
+                html = `
+                    <h2>コード入力・実行モード</h2>
+                    <p>Javaコードを入力して実行できます（Piston API使用）。</p>
+                    <div class="code-area"><textarea id="java-code" style="width:100%;height:150px;background:#333;color:white;">public class Main { public static void main(String[] args) { System.out.println("Hello"); } }</textarea><button id="run-btn" style="background:#2ecc71;color:white;padding:10px;width:100%;">実行</button><pre id="out" style="background:black;color:yellow;padding:10px;">...</pre></div>
+                    <button onclick="location.reload()" class="back-button">戻る</button>
+                `;
+                app.innerHTML = html;
+                document.getElementById('run-btn').addEventListener('click', () => {
+                    const code = document.getElementById('java-code').value;
+                    document.getElementById('out').textContent = "Running...";
+                    fetch("https://emkc.org/api/v2/piston/execute", {
+                        method: "POST", headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({ language: "java", version: "15.0.2", files: [{ content: code }] })
+                    }).then(r => r.json()).then(d => document.getElementById('out').textContent = d.run.output || d.message).catch(e => document.getElementById('out').textContent = "Error");
+                });
+
+            } else if (mode === 'quiz') {
+                if (arg === null) {
+                    // 章選択
+                    html = `<h2>クイズ・章選択</h2><div class="mode-selection">` + 
+                        CHAPTER_TITLES.map((t, i) => `<button onclick="loadContent('quiz', ${i})" class="mode-button" style="margin:5px;font-size:0.9em;">${t}</button>`).join('') +
+                        `</div><br><button onclick="location.reload()" class="back-button">戻る</button>`;
+                    app.innerHTML = html;
+                } else {
+                    // クイズ表示
+                    currentChapterId = arg;
+                    const questions = QUIZ_DATA.filter(q => q.topic.startsWith(CHAPTER_TITLES[currentChapterId].split('.')[0]));
+                    // 範囲チェック
+                    if (currentQuizIndex < 0) currentQuizIndex = 0;
+                    if (currentQuizIndex >= questions.length) currentQuizIndex = 0;
+                    
+                    const q = questions[currentQuizIndex];
+                    if (!q) {
+                         html = `<p>この章にはまだ問題がありません。</p><button class="back-button" onclick="loadContent('quiz', null)">戻る</button>`;
+                         app.innerHTML = html;
+                         return;
+                    }
+
+                    html = `
+                        <h2>${q.topic} (${currentQuizIndex + 1}/${questions.length})</h2>
+                        <div class="quiz-area"><p>${q.question}</p><pre>${q.code_example}</pre>
+                        <div>${q.options.map(o => `<button class="option-button" onclick="checkQuiz('${o}', '${q.correct_answer}')">${o}</button>`).join('')}</div>
+                        <div id="q-res" style="margin-top:10px;font-weight:bold;"></div></div>
+                        <div style="margin-top:10px;">
+                            <button onclick="changeQuiz(-1, ${questions.length})" class="back-button">前へ</button>
+                            <button onclick="changeQuiz(1, ${questions.length})" class="back-button">次へ</button>
+                        </div>
+                        <br><button onclick="loadContent('quiz', null)" class="back-button">章選択に戻る</button>
+                    `;
+                    app.innerHTML = html;
+                }
+
+            } else if (mode === 'challenge') {
+                const isSolve = (arg === 'solve');
+                const c = CHALLENGE_DATA[currentChallengeIndex];
+                
+                if (!isSolve) {
+                    // 説明画面
+                    html = `
+                        <h2>課題: ${c.title}</h2>
+                        <div class="review-area"><p>ファイル: ${c.file}</p><p>${c.description}</p><div style="background:#333;padding:10px;">ヒント: ${c.hints}</div></div>
+                        <div style="margin-top:20px;">
+                            <button onclick="loadContent('challenge', 'solve')" class="mode-button" style="background:#2ecc71;">▶ 解答する</button>
+                            <button onclick="document.getElementById('sol').style.display='block'" class="mode-button" style="background:#e67e22;">模範解答</button>
+                        </div>
+                        <div id="sol" style="display:none;text-align:left;background:#222;padding:10px;margin-top:10px;"><pre>${c.solution_code}</pre></div>
+                        <div style="margin-top:10px;">
+                            <button onclick="changeChallenge(-1)" class="back-button">前へ</button>
+                            <button onclick="changeChallenge(1)" class="back-button">次へ</button>
+                        </div>
+                        <br><button onclick="location.reload()" class="back-button">戻る</button>
+                    `;
+                } else {
+                    // 穴埋め画面
+                    const codeHtml = c.challenge_code.replace('[SNIPPET_HERE]', '<input type="text" id="ans" style="width:200px;color:black;">');
+                    html = `
+                        <h2>${c.title} - 解答</h2>
+                        <div class="code-area" style="text-align:left;"><pre>${codeHtml}</pre><div id="res"></div></div>
+                        <button onclick="checkChallenge('${c.correct_snippet}')" class="mode-button" style="background:#f1c40f;">判定</button>
+                        <br><br><button onclick="loadContent('challenge', null)" class="back-button">説明に戻る</button>
+                    `;
+                }
+                app.innerHTML = html;
+            } else if (mode === 'review') {
+                 const review = REVIEW_DATA[currentReviewIndex];
+                 if(!review) { currentReviewIndex=0; return loadContent('review'); }
+                 html = `
+                    <h2>復習: ${review.title}</h2>
+                    <pre class="code-example">${review.code_example}</pre>
+                    <p>${review.explanation}</p>
+                    <div style="margin-top:10px;">
+                        <button onclick="changeReview(-1)" class="back-button">前へ</button> 
+                        <button onclick="changeReview(1)" class="back-button">次へ</button>
+                    </div>
+                    <button onclick="location.reload()" class="back-button">戻る</button>
+                `;
+                app.innerHTML = html;
+            }
+        }
+
+        // --- ヘルパー関数 (グローバルスコープに公開) ---
+        window.loadContent = loadContent;
+        
+        window.checkQuiz = (ans, corr) => {
+            const res = document.getElementById('q-res');
+            if(ans === corr) res.innerHTML = "<span style='color:lime'>正解！</span>";
+            else res.innerHTML = "<span style='color:red'>不正解... 正解は: " + corr + "</span>";
+        };
+        
+        window.changeQuiz = (dir, len) => {
+            if (dir === 1 && currentQuizIndex < len - 1) currentQuizIndex++;
+            else if (dir === -1 && currentQuizIndex > 0) currentQuizIndex--;
+            loadContent('quiz', currentChapterId);
+        };
+
+        window.changeChallenge = (dir) => {
+            if (dir === 1 && currentChallengeIndex < CHALLENGE_DATA.length - 1) currentChallengeIndex++;
+            else if (dir === -1 && currentChallengeIndex > 0) currentChallengeIndex--;
+            loadContent('challenge', null);
+        };
+        
+        window.changeReview = (dir) => {
+            if (dir === 1 && currentReviewIndex < REVIEW_DATA.length - 1) currentReviewIndex++;
+            else if (dir === -1 && currentReviewIndex > 0) currentReviewIndex--;
+            loadContent('review');
+        };
+
+        window.checkChallenge = (corr) => {
+            const val = document.getElementById('ans').value.replace(/\s/g, '');
+            const target = corr.replace(/\s/g, '');
+            const res = document.getElementById('res');
+            if (val === target) res.innerHTML = "<span style='color:lime;font-weight:bold;'>正解です！</span>";
+            else res.innerHTML = "<span style='color:red;font-weight:bold;'>不正解です。</span>";
+        };
+
+        // 初期化
+        loadProgress();
+        document.getElementById('mode-practice').onclick = () => loadContent('practice');
+        document.getElementById('mode-quiz').onclick = () => loadContent('quiz', null);
+        document.getElementById('mode-review').onclick = () => loadContent('review');
+        document.getElementById('mode-challenge').onclick = () => loadContent('challenge');
+
+    </script>
 </body>
 </html>
